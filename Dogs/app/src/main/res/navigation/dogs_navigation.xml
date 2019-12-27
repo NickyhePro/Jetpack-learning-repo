@@ -27,7 +27,8 @@
         <argument
             android:name="dogUuid"
             android:defaultValue="0"
-            app:argType="integer" />
+            app:argType="integer"
+            />
     </fragment>
 
 </navigation>
