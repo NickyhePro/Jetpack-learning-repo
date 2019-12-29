@@ -8,6 +8,7 @@ import com.nickhe.dogs.model.DogBreed
 import com.nickhe.dogs.model.DogDao
 import com.nickhe.dogs.model.DogDatabase
 import com.nickhe.dogs.model.DogsApiService
+import com.nickhe.dogs.util.NotificationsHelper
 import com.nickhe.dogs.util.SharedPreferenceHelper
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,6 +63,7 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
                     override fun onSuccess(dogList: List<DogBreed>) {
                         storeDogsLocally(dogList)
                         Toast.makeText(getApplication(), "Dogs retrieved from remote", Toast.LENGTH_SHORT).show()
+                        NotificationsHelper(getApplication()).createNotification()
                     }
 
                     override fun onError(e: Throwable) {

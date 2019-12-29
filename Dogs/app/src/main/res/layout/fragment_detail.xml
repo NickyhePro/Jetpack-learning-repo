@@ -3,14 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="dogDetail"
             type="com.nickhe.dogs.model.DogBreed" />
+
+        <variable
+            name="palette"
+            type="com.nickhe.dogs.model.DogPalette" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@{palette.color}"
         tools:context=".view.DetailFragment">
 
         <ImageView
@@ -18,9 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:imageUrl="@{dogDetail.imageUrl}"
             android:minHeight="200dp"
-            android:scaleType="fitCenter"
-            android:imageUrl="@{dogDetail.imageUrl}" />
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/dogName"

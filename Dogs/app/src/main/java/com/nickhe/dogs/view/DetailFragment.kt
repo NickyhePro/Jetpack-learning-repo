@@ -1,6 +1,8 @@
 package com.nickhe.dogs.view
 
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,9 +12,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
+import androidx.palette.graphics.Palette
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 
 import com.nickhe.dogs.R
 import com.nickhe.dogs.databinding.FragmentDetailBinding
+import com.nickhe.dogs.model.DogPalette
 import com.nickhe.dogs.util.getProgressDrawable
 import com.nickhe.dogs.util.loadImage
 import com.nickhe.dogs.viewmodel.DetailViewModel
@@ -54,11 +61,36 @@ class DetailFragment : Fragment() {
         observeViewModel()
     }
 
-    fun observeViewModel() {
+    private fun observeViewModel() {
         viewModel.dog.observe(this, Observer { dog ->
             dog?.let {
                 dataBinding.dogDetail = dog
+
+                dog.imageUrl?.let {
+                    setupBackgroundColor(it )
+                }
             }
         })
+    }
+
+    private fun setupBackgroundColor(url: String) {
+        Glide.with(this)
+            .asBitmap()
+            .load(url)
+            .into(object: CustomTarget<Bitmap>(){
+                override fun onLoadCleared(placeholder: Drawable?) {
+                }
+
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    Palette.from(resource)
+                        .generate {
+                            val intColor = it?.vibrantSwatch?.rgb ?: 0
+                            val myPalette = DogPalette(intColor)
+                            dataBinding.palette = myPalette
+                        }
+                }
+
+
+            })
     }
 }
