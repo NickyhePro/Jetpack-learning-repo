@@ -17,6 +17,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
+import java.lang.NumberFormatException
 
 class ListViewModel(application: Application) : BaseViewModel(application) {
 
@@ -31,6 +32,7 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
     val loading = MutableLiveData<Boolean>()
 
     fun refresh() {
+        checkCacheDuration()
         val updateTime = prefsHelper.getUpdateTime()
         if (updateTime != null && updateTime != 0L && System.nanoTime() - updateTime < refreshTime) {
             fetchDataLocally()
@@ -39,7 +41,18 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    fun refreshBypassCache(){
+    private fun checkCacheDuration() {
+        val cachePreference = prefsHelper.getCacheDuration()
+
+        try {
+            val cachePreferenceInt = cachePreference?.toInt() ?: 5 * 60
+            refreshTime = cachePreferenceInt.times( 1000 * 1000 * 1000L)
+        } catch (e: NumberFormatException) {
+            print(e.stackTrace)
+        }
+    }
+
+    fun refreshBypassCache() {
         fetchDataFromRemote()
     }
 
@@ -48,7 +61,8 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
         launch {
             val dogs = DogDatabase(getApplication()).dogDao().getAllDogs()
             dogsRetrieved(dogs)
-            Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -62,7 +76,11 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
 
                     override fun onSuccess(dogList: List<DogBreed>) {
                         storeDogsLocally(dogList)
-                        Toast.makeText(getApplication(), "Dogs retrieved from remote", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            getApplication(),
+                            "Dogs retrieved from remote",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         NotificationsHelper(getApplication()).createNotification()
                     }
 
